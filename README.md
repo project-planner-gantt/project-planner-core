@@ -16,7 +16,24 @@ The shared task dialog edits dates, status tags, stages, progress, and Markdown 
 
 ![Shared task editor with scheduling fields and Markdown notes](docs/images/project-gantt-task-editor.png)
 
-## Responsibilities
+## Dependencies
+
+| Dependency | Requirement | Purpose |
+| --- | --- | --- |
+| [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) | **Optional companion plugin for Obsidian users** | The task syntax is based on the Tasks emoji metadata format. Tasks is not needed to parse or edit documents, and the core does not import or call its API. |
+| Svelte 5 | Required peer dependency for the shared UI | Component framework and reactive runtime for the Gantt editor and dialogs. The engine's root entry point does not import Svelte. |
+| `@svar-ui/svelte-gantt` | Required for the shared UI | Renders the Gantt chart, task bars, and dependency links. |
+| `@svar-ui/svelte-core` and `@svar-ui/core-locales` | Required for the shared UI | Calendar widgets, themes, and English/Russian widget localization. |
+| CodeMirror 6 and `@lezer/highlight` | Required for the shared UI | Markdown editing and syntax highlighting in task and group notes. |
+| `yaml` | Required by the document engine | Parses YAML project frontmatter. The built root entry point keeps this package as an external dependency. |
+| Node.js, npm, TypeScript, Vite, and the Svelte Vite plugin | Development/build only | Install packages, compile the engine, and build consuming applications. |
+| Vitest and svelte-check | Development only | Unit testing and Svelte/TypeScript validation. |
+
+Exact versions are recorded in [package.json](package.json) and `package-lock.json`. Obsidian and Tauri are host integrations, not dependencies of the TypeScript document engine.
+
+**Task format compatibility:** only a subset of Tasks-style metadata is supported. Project Gantt also uses its own progress markers, milestone/stage tags, and block-ID-based dependencies. These extensions should not be interpreted as full Tasks compatibility. The original date markers are documented in the [Tasks date-format guide](https://github.com/obsidian-tasks-group/obsidian-tasks/blob/main/docs/Getting%20Started/Dates.md).
+
+## Package responsibilities
 
 - Parse Markdown projects, headings, tasks, dates, and dependencies.
 - Map project documents to chart rows.
