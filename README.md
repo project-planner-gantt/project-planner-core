@@ -6,6 +6,16 @@ The package combines a TypeScript document engine with a Svelte 5 / SVAR Gantt i
 
 The package name remains `@project-planner/core`. It is currently a private local package, not a published npm dependency.
 
+## Screenshots
+
+The shared editor hosted by the Obsidian plugin, displaying the bundled [development-plan demo](samples/demo-project.md). The interface is set to English; task names remain in the original Russian Markdown.
+
+![Shared Project Gantt editor showing task groups, dependencies, dates, and progress inside Obsidian](docs/images/project-gantt-overview.png)
+
+The shared task dialog edits dates, status tags, stages, progress, and Markdown notes:
+
+![Shared task editor with scheduling fields and Markdown notes](docs/images/project-gantt-task-editor.png)
+
 ## Responsibilities
 
 - Parse Markdown projects, headings, tasks, dates, and dependencies.
@@ -148,4 +158,4 @@ Personal and commercial use, modification, and free redistribution are permitted
 
 This is a source-available project with restrictions on paid distribution, not an OSI-approved open-source license. The full license text governs.
 
-<!-- docs-source: repository=https://gitea.bvn13.me/management/project-planner-core.git; branch=feature/project-gantt; commit=fa4477e3dfebd5c588715de05fd1c0923029f51d; tag=; path=README.md; dirty=true -->
+<!-- docs-source: repository=https://gitea.bvn13.me/management/project-planner-core.git; branch=feature/project-gantt; commit=bfe628b4ed4a898797618ac56d875dff85a99b79; tag=; path=README.md; dirty=true -->
