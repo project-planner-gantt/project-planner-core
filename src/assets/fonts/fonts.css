@@ -1,0 +1,39 @@
+/*
+ * Fonts of SVAR's Willow theme, bundled locally (downloaded from cdn.svar.dev).
+ * The theme is used with fonts={false}, so nothing is fetched from the CDN:
+ * the app works offline and the exported HTML is fully self-contained.
+ * Open Sans — SIL Open Font License 1.1; wx-icons — SVAR (MIT).
+ */
+@import "./wx-icons.css";
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./open-sans-regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./open-sans-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./open-sans-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./open-sans-700.woff2") format("woff2");
+}

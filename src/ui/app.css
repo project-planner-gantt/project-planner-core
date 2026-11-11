@@ -1,0 +1,161 @@
+.pp-scope { position: relative; isolation: isolate; min-height: 0; color: var(--pp-text, #1f2329); background: var(--pp-bg, #fff); font: 13px "Segoe UI", system-ui, sans-serif; }
+.pp-scope *, .pp-scope *::before, .pp-scope *::after { box-sizing: border-box; }
+.pp-scope.pp-app { display: flex; flex-direction: column; height: 100%; }
+.pp-scope .pp-toolbar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 6px 10px; border-bottom: 1px solid #e3e5e8; background: var(--pp-panel, #f7f8fa);
+}
+.pp-scope .pp-toolbar button, .pp-scope .pp-toolbar select, .pp-scope .pp-dialog button {
+  font: inherit; padding: 3px 9px; border: 1px solid #c9cdd4; border-radius: 4px;
+  background: var(--pp-bg, #fff); cursor: pointer;
+}
+.pp-scope .pp-toolbar button:hover { background: #eef1f5; }
+.pp-scope .pp-primary { background: #2f80ed !important; border-color: #2f80ed !important; color: #fff; }
+.pp-scope .pp-primary:disabled { opacity: .5; cursor: default; }
+.pp-scope .pp-level { min-width: 34px; }
+.pp-scope .pp-title { font-weight: 600; margin: 0 8px; max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-scope .pp-env { margin-left: auto; color: #8a919c; }
+.pp-scope .pp-gantt { flex: 1; min-height: 0; position: relative; }
+.pp-scope .pp-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #6b7280; }
+.pp-scope .pp-gantt .wx-gantt-holidays > div { position: absolute; top: 0; height: 100%; }
+.pp-scope .pp-gantt .pp-weekend { background-color: rgba(0, 0, 0, .06); }
+.pp-scope .pp-gantt .pp-day-highlight { background-image: linear-gradient(rgba(245, 158, 11, .22), rgba(245, 158, 11, .22)); }
+.pp-scope .pp-gantt .wx-scale .wx-cell { cursor: pointer; }
+.pp-scope .pp-gantt .wx-scale .wx-cell:hover { background-color: rgba(47, 128, 237, .08); }
+.pp-scope .pp-gantt .wx-bar .wx-progress-percent { background-color: rgba(0, 0, 0, .18) !important; }
+.pp-scope .pp-gantt .wx-bar.wx-task.done .wx-progress-percent { background-color: transparent !important; }
+.pp-scope .pp-gantt .wx-bar.wx-task.cancelled { text-decoration: line-through; color: #4b5563; }
+.pp-scope .pp-gantt .wx-bar.wx-task.cancelled .wx-progress-percent { background-color: transparent !important; }
+.pp-scope .pp-gantt .wx-row[data-id=":__root__"], .pp-scope .pp-gantt .wx-row[data-id^=":group-"] { font-weight: 600; }
+.pp-scope .pp-gantt .wx-bar.wx-summary { opacity: .9; }
+.pp-scope .pp-markers { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.pp-scope .pp-marker { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--c); opacity: .8; }
+.pp-scope .pp-marker span {
+  position: absolute; top: 2px; left: 4px; padding: 0 4px; border-radius: 3px;
+  background: var(--c); color: #fff; font-size: 11px; white-space: nowrap;
+}
+.pp-scope .pp-marker-today { z-index: 1; }
+.pp-scope .pp-marker-today span { left: auto; right: 4px; }
+.pp-scope .pp-notice {
+  position: absolute; bottom: 14px; right: 14px; max-width: calc(100vw - 28px); box-sizing: border-box;
+  background: #333; color: #fff; padding: 8px 14px; border-radius: 6px; z-index: 30;
+}
+.pp-scope .pp-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .25); z-index: 20; }
+.pp-scope .pp-dialog {
+  position: absolute; top: 15%; left: 50%; transform: translateX(-50%); z-index: 21;
+  width: min(520px, 92vw); background: var(--pp-bg, #fff); border-radius: 8px; padding: 16px 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .2); display: flex; flex-direction: column; gap: 10px;
+}
+.pp-scope .pp-dialog h3 { margin: 0; }
+.pp-scope .pp-dialog label { display: flex; flex-direction: column; gap: 3px; }
+.pp-scope .pp-dialog input:not([type=checkbox]) { font: inherit; padding: 4px 6px; border: 1px solid #c9cdd4; border-radius: 4px; }
+.pp-scope .pp-dialog .pp-row { display: flex; gap: 12px; }
+.pp-scope .pp-dialog .pp-row label { flex: 1; }
+.pp-scope .pp-dialog .pp-check { flex-direction: row; align-items: center; gap: 6px; }
+.pp-scope .pp-raw { font-size: 11px; color: #6b7280; background: #f3f4f6; padding: 4px 6px; border-radius: 4px; overflow-x: auto; white-space: nowrap; }
+.pp-scope .pp-buttons { display: flex; justify-content: flex-end; gap: 8px; }
+.pp-scope .pp-kind { display: flex; align-items: center; gap: 8px; }
+.pp-scope .pp-kind .pp-off { color: #8a919c; }
+.pp-scope .pp-dialog .pp-switch {
+  position: relative; width: 34px; height: 18px; padding: 0; border-radius: 9px;
+  border: none; background: #c9cdd4; cursor: pointer; transition: background .15s;
+}
+.pp-scope .pp-dialog .pp-switch span {
+  position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--pp-bg, #fff); box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .15s;
+}
+.pp-scope .pp-dialog .pp-switch.pp-on { background: #2f80ed; }
+.pp-scope .pp-dialog .pp-switch.pp-on span { transform: translateX(16px); }
+.pp-scope .pp-spacer { flex: 1; }
+.pp-scope .pp-dim { color: #8a919c; font-size: 12px; }
+.pp-scope .pp-toolbar .pp-env { margin-left: 0; }
+.pp-scope .pp-open { position: relative; display: flex; }
+.pp-scope .pp-open > button:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.pp-scope .pp-open .pp-open-more { border-left: none; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 3px 6px; }
+.pp-scope .pp-menu {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 25; min-width: 360px; max-width: 560px;
+  background: var(--pp-bg, #fff); border: 1px solid #d5d9df; border-radius: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, .15); padding: 4px;
+}
+.pp-scope .pp-menu-item { display: flex; align-items: stretch; border-radius: 4px; }
+.pp-scope .pp-menu-item:hover { background: #f0f3f7; }
+.pp-scope .pp-toolbar .pp-menu button { border: none; background: transparent; }
+.pp-scope .pp-menu-open { flex: 1; display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; }
+.pp-scope .pp-menu-title { font-weight: 600; }
+.pp-scope .pp-menu-path { color: #8a919c; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.pp-scope .pp-missing .pp-menu-title { color: #b0b6bf; text-decoration: line-through; }
+.pp-scope .pp-menu-forget { color: #8a919c; }
+.pp-scope .pp-toolbar .pp-menu .pp-menu-other { width: 100%; text-align: left; border-top: 1px solid #eef0f3; border-radius: 0; margin-top: 4px; padding-top: 6px; }
+.pp-scope .pp-export .pp-menu { left: auto; right: 0; min-width: 280px; }
+.pp-scope .pp-menu-note { display: flex; flex-direction: column; padding: 4px 8px; color: #6b7280; font-size: 12px; }
+.pp-scope .pp-toolbar .pp-menu .pp-menu-other.pp-menu-first:first-child { border-top: none; margin-top: 0; padding-top: 3px; }
+.pp-scope .pp-start-recent { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pp-scope .pp-link { border: none; background: none; color: #2f80ed; cursor: pointer; font: inherit; padding: 2px; }
+.pp-scope .pp-link:disabled { color: #b0b6bf; cursor: default; }
+.pp-scope .pp-stages { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.pp-scope .pp-stages > span { width: 100%; }
+.pp-scope .pp-section-title { font-weight: 600; }
+.pp-scope .pp-stage-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: 40vh; overflow: auto; }
+.pp-scope .pp-stage-list li { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 4px; background: #f6f7f9; }
+.pp-scope .pp-stage-list button { padding: 0 7px !important; }
+.pp-scope .pp-dialog .pp-row { align-items: center; }
+.pp-scope .pp-dialog .pp-row input { flex: 1; }
+.pp-scope .pp-tip { padding: 6px 8px; max-width: 360px; font-size: 12px; line-height: 1.45; }
+.pp-scope .pp-tip-title { font-weight: 600; margin-bottom: 2px; }
+.pp-scope .pp-tip-meta { color: #8a919c; margin-bottom: 4px; }
+.pp-scope .pp-settings { width: min(640px, 94vw); max-height: 80vh; overflow: auto; }
+.pp-scope .pp-marker-list { display: flex; flex-direction: column; gap: 2px; max-height: 32vh; overflow: auto; padding-right: 4px; }
+.pp-scope .pp-marker-row { display: flex; align-items: center; gap: 6px; }
+.pp-scope .pp-marker-row .pp-marker-label { flex: 1; min-width: 0; }
+.pp-scope .pp-marker-row .pp-marker-color { width: 84px; }
+.pp-scope .pp-marker-row input[type=color] { width: 28px; height: 26px; padding: 0; border: 1px solid #c9cdd4; border-radius: 4px; background: none; }
+.pp-scope .pp-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0, 0, 0, .15); flex: none; }
+.pp-scope .pp-palette { display: flex; gap: 4px; margin: 0 0 6px 2px; }
+.pp-scope .pp-dialog .pp-palette-dot { width: 14px; height: 14px; padding: 0; border-radius: 50%; border: 1px solid rgba(0, 0, 0, .15); cursor: pointer; }
+.pp-scope .pp-invalid { border-color: #E84855 !important; }
+.pp-scope .pp-datefield { display: inline-flex; align-items: stretch; border: 1px solid #c9cdd4; border-radius: 4px; background: var(--pp-bg, #fff); }
+.pp-scope .pp-datefield input { border: none !important; width: 92px; font: inherit; padding: 4px 6px; outline: none; background: transparent; }
+.pp-scope .pp-dialog .pp-datefield button { border: none; border-left: 1px solid #e3e5e8; border-radius: 0 4px 4px 0; padding: 0 6px; background: var(--pp-panel, #f7f8fa); cursor: pointer; }
+.pp-scope .pp-datefield.pp-invalid { border-color: #E84855; }
+.pp-scope .pp-dialog .pp-datefield.pp-clearable .pp-date-cal { border-radius: 0; }
+.pp-scope .pp-dialog .pp-datefield .pp-date-clear { color: #E84855; font-weight: 700; }
+.pp-scope .pp-dialog .pp-datefield .pp-date-clear:disabled { color: #c9cdd4; cursor: default; }
+.pp-scope .pp-cal-pop { position: absolute; z-index: 40; background: var(--pp-bg, #fff); border: 1px solid #d5d9df; border-radius: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
+.pp-scope .pp-dialog .pp-danger-outline { color: #c62f3b; border-color: #e8a1a7; }
+.pp-scope .pp-dialog .pp-danger-outline:hover { background: #fdf1f2; }
+.pp-scope .pp-dialog .pp-danger { background: #E84855; border-color: #E84855; color: #fff; }
+.pp-scope .pp-backdrop-top { z-index: 22; }
+.pp-scope .pp-confirm { z-index: 23; top: 25%; width: min(420px, 90vw); }
+.pp-scope .pp-confirm p { margin: 0; }
+.pp-scope .pp-buttons .pp-spacer { flex: 1; }
+.pp-scope .pp-md { border: 1px solid #c9cdd4; border-radius: 4px; }
+.pp-scope .pp-md .cm-editor { max-height: 40vh; min-height: 90px; font-size: 13px; }
+.pp-scope .pp-md .cm-editor.cm-focused { outline: none; }
+.pp-scope .pp-md:focus-within { border-color: #7b8cde; }
+.pp-scope .pp-md .cm-scroller { font-family: inherit; line-height: 1.45; }
+.pp-scope .pp-md .cm-placeholder { color: #9ca3af; }
+.pp-scope .pp-tip-notes { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, .25); max-height: 280px; overflow: hidden; }
+.pp-scope .pp-tip-notes .pp-mdr-gap { margin-top: 6px; }
+.pp-scope .pp-tip-notes .pp-mdr-h { font-weight: 700; }
+.pp-scope .pp-tip-notes .pp-mdr-h1 { font-size: 1.2em; }
+.pp-scope .pp-tip-notes .pp-mdr-h2 { font-size: 1.1em; }
+.pp-scope .pp-tip-notes .pp-mdr-li { display: flex; gap: 5px; padding-left: calc(var(--lvl) * 14px); }
+.pp-scope .pp-tip-notes .pp-mdr-mark { flex: none; opacity: .6; }
+.pp-scope .pp-tip-notes .pp-mdr-done { opacity: .6; text-decoration: line-through; }
+.pp-scope .pp-tip-notes .pp-mdr-quote { border-left: 3px solid rgba(255, 255, 255, .35); padding-left: 6px; opacity: .85; font-style: italic; }
+.pp-scope .pp-tip-notes .pp-mdr-link { color: #93c5fd; }
+.pp-scope .pp-tip-notes .pp-mdr-tag { color: #c4b5fd; }
+.pp-scope .pp-tip-notes code, .pp-scope .pp-tip-notes pre { font-family: Consolas, monospace; color: inherit; background: rgba(255, 255, 255, .14); border-radius: 3px; padding: 0 3px; }
+.pp-scope .pp-tip-notes pre { margin: 4px 0; padding: 4px 6px; white-space: pre-wrap; }
+.pp-scope .pp-tip-notes mark { background: #fde047; color: #1f2937; border-radius: 2px; padding: 0 2px; }
+.pp-scope .pp-tip-notes hr { border: none; border-top: 1px solid rgba(255, 255, 255, .25); margin: 4px 0; }
+.pp-scope .pp-move { display: flex; align-items: center; justify-content: center; height: 100%; opacity: 0; transition: opacity .12s; }
+.pp-scope .pp-gantt .wx-row:hover .pp-move { opacity: .35; }
+.pp-scope .pp-gantt .wx-row:hover .pp-move:hover { opacity: 1; }
+.pp-scope .pp-move button { width: 15px; height: 20px; padding: 0; border: none; background: none; color: #4b5563; cursor: pointer; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+.pp-scope .pp-move button:hover:not(:disabled) { background: #e5e7eb; color: #111827; }
+.pp-scope .pp-move button:disabled { opacity: .3; cursor: default; }
+.pp-scope .pp-move svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.pp-scope .pp-dialog { color: var(--pp-text, #1f2329); max-height: 85%; overflow: auto; }
+.pp-scope button, .pp-scope input, .pp-scope select { color: inherit; }
+.pp-scope .pp-gantt { min-height: 0; }

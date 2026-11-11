@@ -1,0 +1,55 @@
+{
+  "name": "@project-planner/core",
+  "version": "2.0.0",
+  "private": true,
+  "author": "bvn13",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core/*": "./src/core/*.ts",
+    "./ui": "./src/ui/Planner.svelte",
+    "./ui/*": "./src/ui/*.ts",
+    "./styles.css": "./src/ui/app.css",
+    "./fonts.css": "./src/assets/fonts/fonts.css",
+    "./ui/*.svelte": "./src/ui/*.svelte",
+    "./ui/today.svelte": "./src/ui/today.svelte.ts"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:core": "tsc -p tsconfig.core.json",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json && vite build -c vite.core.config.ts"
+  },
+  "dependencies": {
+    "@codemirror/commands": "6.11.1",
+    "@codemirror/lang-markdown": "6.5.2",
+    "@codemirror/language": "6.13.1",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.15",
+    "@lezer/highlight": "1.2.5",
+    "@svar-ui/svelte-gantt": "2.8.1",
+    "yaml": "2.9.1",
+    "@svar-ui/svelte-core": "2.6.1",
+    "@svar-ui/core-locales": "2.6.1"
+  },
+  "peerDependencies": {
+    "svelte": "5.57.2"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@tsconfig/svelte": "5.0.8",
+    "svelte": "5.57.2",
+    "svelte-check": "4.7.7",
+    "typescript": "5.9.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
+  }
+}
