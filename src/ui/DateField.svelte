@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { getI18n } from "./i18n";
+  const { t, words } = getI18n();
   // Date input with SVAR's calendar in a popover. Replaces <input type=date>:
   // the native picker in WebView2 always opens downwards and gets clipped by
   // the window edge. Ours opens below the field, or above when there's no room,
   // and is `position: fixed`, so a scrolling list around the field can't clip it.
   import { Calendar, Locale, Willow } from "@svar-ui/svelte-core";
-  import { ru } from "@svar-ui/core-locales";
+
   import { isoToDate, dateToIso } from "./svarAdapter";
 
   let { value = $bindable(), invalid = false, clearable = false }: {
@@ -120,17 +122,17 @@
     oninput={e => (text = (e.target as HTMLInputElement).value)}
     onblur={commit}
     onkeydown={e => { if (e.key === "Enter") { e.preventDefault(); commit(); } }}
-    placeholder="ДД.ММ.ГГГГ"
+    placeholder={t("ДД.ММ.ГГГГ")}
   />
-  <button type="button" class="pp-date-cal" title="Календарь" onclick={toggle}>📅</button>
+  <button type="button" class="pp-date-cal" title={t("Календарь")} onclick={toggle}>📅</button>
   {#if clearable}
-    <button type="button" class="pp-date-clear" title="Очистить" disabled={!value && !text} onclick={clear}>✕</button>
+    <button type="button" class="pp-date-clear" title={t("Очистить")} disabled={!value && !text} onclick={clear}>✕</button>
   {/if}
 </span>
 
 {#if open}
   <div class="pp-cal-pop" use:portal style="left:{pos.left}px;top:{pos.top}px">
-    <Locale words={ru}>
+    <Locale {words}>
       <Willow fonts={false}>
         <Calendar value={ISO.test(value) ? isoToDate(value) : new Date()} buttons={["today"]} onchange={pick} />
       </Willow>

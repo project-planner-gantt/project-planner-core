@@ -34,6 +34,8 @@
 </script>
 
 <script lang="ts">
+  import { getI18n } from "./i18n";
+  const { t, words } = getI18n();
   import { untrack } from "svelte";
   import { dialogKeys } from "./dialogKeys";
   import type { PlanRow } from "../core/types";
@@ -118,40 +120,40 @@
 
 <div class="pp-backdrop" role="presentation" onclick={oncancel}></div>
 <form class="pp-dialog" onsubmit={submit} use:dialogKeys={e => { if (e.key !== "Escape") return; if (confirmingDelete) confirmingDelete = false; else oncancel(); }}>
-  <h3>{mode === "add" ? (asGroup ? "Новая группа" : "Новая задача") : isGroup ? "Группа" : "Задача"}</h3>
+  <h3>{mode === "add" ? (asGroup ? t("Новая группа") : t("Новая задача")) : isGroup ? t("Группа") : t("Задача")}</h3>
 
   {#if mode === "add" && canAddGroup}
     <div class="pp-kind">
-      <span class:pp-off={asGroup}>Задача</span>
+      <span class:pp-off={asGroup}>{t("Задача")}</span>
       <button
         type="button"
         role="switch"
         aria-checked={asGroup}
-        aria-label="Группа"
+        aria-label={t("Группа")}
         class="pp-switch"
         class:pp-on={asGroup}
         onclick={() => (asGroup = !asGroup)}
       ><span></span></button>
-      <span class:pp-off={!asGroup}>Группа</span>
+      <span class:pp-off={!asGroup}>{t("Группа")}</span>
     </div>
   {/if}
 
   <label>
-    {isGroup ? "Заголовок" : "Описание"}
+    {isGroup ? t("Заголовок") : t("Описание")}
     <input bind:value={text} use:focus />
   </label>
 
   {#if !isGroup}
-    <label class="pp-check"><input type="checkbox" bind:checked={milestoneFlag} /> #milestone <span class="pp-dim">— веха: без даты старта, только дата</span></label>
+    <label class="pp-check"><input type="checkbox" bind:checked={milestoneFlag} /> #milestone <span class="pp-dim">{t("— веха: без даты старта, только дата")}</span></label>
     <div class="pp-row">
       {#if !asMilestone}
-        <label>Старт <DateField bind:value={start} clearable /></label>
+        <label>{t("Старт")} <DateField bind:value={start} clearable /></label>
       {/if}
-      <label>{asMilestone ? "Дата" : "Финиш"} <DateField bind:value={end} clearable={!asMilestone} invalid={asMilestone && !end} /></label>
+      <label>{asMilestone ? t("Дата") : t("Финиш")} <DateField bind:value={end} clearable={!asMilestone} invalid={asMilestone && !end} /></label>
     </div>
 
     <div class="pp-stages">
-      <span>Статус</span>
+      <span>{t("Статус")}</span>
       {#each SPECIAL_TAGS as t (t)}
         <label class="pp-check">
           <input
@@ -165,7 +167,7 @@
 
     {#if offered.length}
       <div class="pp-stages">
-        <span>Этапы</span>
+        <span>{t("Этапы")}</span>
         {#each offered as s (s)}
           <label class="pp-check"><input type="checkbox" checked={picked.has(s)} onchange={() => toggle(s)} /> #{s}</label>
         {/each}
@@ -173,72 +175,72 @@
     {/if}
 
     {#if mode === "edit" && !initial?.done && !initial?.task?.cancelled && !asMilestone}
-      <label>Прогресс: {progress}% <input type="range" min="0" max="100" step="5" bind:value={progress} /></label>
+      <label>{t("Прогресс")}: {progress}% <input type="range" min="0" max="100" step="5" bind:value={progress} /></label>
     {/if}
     {#if mode === "edit" && !initial?.task?.cancelled}
-      <label class="pp-check"><input type="checkbox" bind:checked={done} /> Выполнена {initial?.done ? `(✅ ${initial.task?.completionDate ?? ""})` : "(✅ сегодня)"}</label>
+      <label class="pp-check"><input type="checkbox" bind:checked={done} /> {t("Выполнена")} {initial?.done ? `(✅ ${initial.task?.completionDate ?? ""})` : t("(✅ сегодня)")}</label>
     {/if}
   {/if}
 
   {#if initial?.task}
-    <code class="pp-raw" title="Строка {initial.task.lineNumber + 1}">{initial.task.raw.trim()}</code>
+    <code class="pp-raw" title={`${t("Строка")} ${initial.task.lineNumber + 1}`}>{initial.task.raw.trim()}</code>
   {/if}
 
   {#if body !== null}
-    <MarkdownField bind:value={body} hint={isGroup ? "Текст раздела до первой задачи (markdown)" : "Заметки и подзадачи под строкой задачи (markdown)"} />
+    <MarkdownField bind:value={body} hint={isGroup ? t("Текст раздела до первой задачи (markdown)") : t("Заметки и подзадачи под строкой задачи (markdown)")} />
   {/if}
 
   <div class="pp-buttons">
     {#if mode === "edit" && deleteInfo && ondelete}
-      <button type="button" class="pp-danger-outline" onclick={() => (confirmingDelete = true)}>Удалить…</button>
+      <button type="button" class="pp-danger-outline" onclick={() => (confirmingDelete = true)}>{t("Удалить…")}</button>
       {#if initial?.task && !initial.done && oncancelTask}
-        <button type="button" onclick={oncancelTask}>{initial.task.cancelled ? "Вернуть" : "Отменить"}</button>
+        <button type="button" onclick={oncancelTask}>{initial.task.cancelled ? t("Вернуть") : t("Отменить")}</button>
       {/if}
       <span class="pp-spacer"></span>
     {/if}
-    <button type="button" onclick={oncancel}>Отмена</button>
-    <button type="submit" class="pp-primary" disabled={!valid}>{mode === "add" ? "Добавить" : "Сохранить"}</button>
+    <button type="button" onclick={oncancel}>{t("Отмена")}</button>
+    <button type="submit" class="pp-primary" disabled={!valid}>{mode === "add" ? t("Добавить") : t("Сохранить")}</button>
   </div>
 </form>
 
 {#if confirmingDelete && deleteInfo && initial && isGroup}
   <div class="pp-backdrop pp-backdrop-top" role="presentation" onclick={() => (confirmingDelete = false)}></div>
   <div class="pp-dialog pp-confirm" role="alertdialog">
-    <h3>Удалить группу?</h3>
-    <p>Заголовок «{initial.text}» будет удалён из файла вместе со всем своим разделом.</p>
+    <h3>{t("Удалить группу?")}</h3>
+    <p>{t("Заголовок «")}{initial.text}{t("» будет удалён из файла вместе со всем своим разделом.")}</p>
     {#if deleteInfo.subtasks}
-      <p>Удалятся задачи (с подзадачами): {deleteInfo.subtasks}.</p>
+      <p>{t("Удалятся задачи (с подзадачами)")}: {deleteInfo.subtasks}.</p>
     {/if}
     {#if deleteInfo.subgroups}
-      <p>Удалятся подгруппы: {deleteInfo.subgroups}.</p>
+      <p>{t("Удалятся подгруппы")}: {deleteInfo.subgroups}.</p>
     {/if}
     {#if deleteInfo.notes}
-      <p>Удалятся строки текста (заметки, ссылки, картинки): {deleteInfo.notes}.</p>
+      <p>{t("Удалятся строки текста (заметки, ссылки, картинки)")}: {deleteInfo.notes}.</p>
     {/if}
     {#if deleteInfo.refs}
-      <p>Ссылки ⛔ на удалённые задачи будут убраны из задач: {deleteInfo.refs}.</p>
+      <p>{t("Ссылки ⛔ на удалённые задачи будут убраны из задач")}: {deleteInfo.refs}.</p>
     {/if}
-    <p class="pp-dim">Отменить можно только правкой файла.</p>
+    <p class="pp-dim">{t("Отменить можно только правкой файла.")}</p>
     <div class="pp-buttons">
-      <button type="button" onclick={() => (confirmingDelete = false)}>Отмена</button>
-      <button type="button" class="pp-danger" onclick={() => ondelete?.()}>Удалить</button>
+      <button type="button" onclick={() => (confirmingDelete = false)}>{t("Отмена")}</button>
+      <button type="button" class="pp-danger" onclick={() => ondelete?.()}>{t("Удалить")}</button>
     </div>
   </div>
 {:else if confirmingDelete && deleteInfo && initial?.task}
   <div class="pp-backdrop pp-backdrop-top" role="presentation" onclick={() => (confirmingDelete = false)}></div>
   <div class="pp-dialog pp-confirm" role="alertdialog">
-    <h3>Удалить задачу?</h3>
-    <p>«{initial.task.description}» будет удалена из файла.</p>
+    <h3>{t("Удалить задачу?")}</h3>
+    <p>«{initial.task.description}{t("» будет удалена из файла.")}</p>
     {#if deleteInfo.subtasks}
-      <p>Вместе с ней удалятся подзадачи: {deleteInfo.subtasks}.</p>
+      <p>{t("Вместе с ней удалятся подзадачи")}: {deleteInfo.subtasks}.</p>
     {/if}
     {#if deleteInfo.refs}
-      <p>Ссылки ⛔ на неё будут убраны из задач: {deleteInfo.refs}.</p>
+      <p>{t("Ссылки ⛔ на неё будут убраны из задач")}: {deleteInfo.refs}.</p>
     {/if}
-    <p class="pp-dim">Отменить можно только правкой файла.</p>
+    <p class="pp-dim">{t("Отменить можно только правкой файла.")}</p>
     <div class="pp-buttons">
-      <button type="button" onclick={() => (confirmingDelete = false)}>Отмена</button>
-      <button type="button" class="pp-danger" onclick={() => ondelete?.()}>Удалить</button>
+      <button type="button" onclick={() => (confirmingDelete = false)}>{t("Отмена")}</button>
+      <button type="button" class="pp-danger" onclick={() => ondelete?.()}>{t("Удалить")}</button>
     </div>
   </div>
 {/if}

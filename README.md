@@ -15,7 +15,17 @@ The package name remains `@project-planner/core`. It is currently a private loca
 - Detect stale edits and serialize updates within each store.
 - Render the shared chart, task dialogs, stage filters, and settings.
 
-Platform file dialogs, recent-file lists, and Obsidian workspace navigation belong to the host application. The current shared interface is in Russian.
+Platform file dialogs, recent-file lists, and Obsidian workspace navigation belong to the host application. The shared interface supports English and Russian.
+
+## Localization
+
+Language preference types, validation, system-language resolution, and dictionaries live in [src/core/i18n.ts](src/core/i18n.ts). The preference is `system`, `en`, or `ru`; unsupported system languages resolve to English. The module has no UI or platform dependency.
+
+Pass a resolved `language` (`en` or `ru`) to `Planner`. Each instance provides its own translation and SVAR locale context through [src/ui/i18n.ts](src/ui/i18n.ts). The language is selected when the component mounts; remount the component when changing it. Svelte hosts can wrap it in `{#key language}`. The default remains Russian for existing integrations that omit this prop.
+
+The host owns preference storage: Obsidian uses plugin data; the desktop application uses a user configuration file. Language is not a project frontmatter setting. Project titles, task text, tags, custom markers, and the Markdown date format are not translated. Date inputs retain the unambiguous `DD.MM.YYYY` format; calendar month/day labels follow the selected locale.
+
+The desktop HTML viewer receives the resolved language in its export payload. Older exports without a language retain Russian as their fallback.
 
 ## Development
 
@@ -138,4 +148,4 @@ Personal and commercial use, modification, and free redistribution are permitted
 
 This is a source-available project with restrictions on paid distribution, not an OSI-approved open-source license. The full license text governs.
 
-<!-- docs-source: repository=https://gitea.bvn13.me/management/project-planner-core.git; branch=feature/project-gantt; commit=3e3f33ef4801bbe0f45cd30c8451361fbc99f646; tag=; path=README.md; dirty=true -->
+<!-- docs-source: repository=https://gitea.bvn13.me/management/project-planner-core.git; branch=feature/project-gantt; commit=fa4477e3dfebd5c588715de05fd1c0923029f51d; tag=; path=README.md; dirty=true -->

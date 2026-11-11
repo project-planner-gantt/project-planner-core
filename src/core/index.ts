@@ -6,3 +6,4 @@ export * from "./store";
 export * from "./frontmatter";
 export * from "./depth";
 export * from "./document";
+export * from "./i18n";

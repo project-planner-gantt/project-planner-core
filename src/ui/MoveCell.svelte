@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getI18n } from "./i18n";
+  const { t, words } = getI18n();
   // Grid cell with ⤒ ↑ ↓ ⤓: move tasks and groups among their siblings.
   // Hidden until the pointer is over the row. Only the open file gets buttons.
   import { getContext } from "svelte";
@@ -12,12 +14,12 @@
   const can = $derived(mover?.can(row.row) ?? null);
 
   const buttons: { move: ListMove | DepthMove; title: string; path: string }[] = [
-    { move: "top", title: "В начало списка", path: "M3 3h10M8 13V6M4.5 9.5 8 6l3.5 3.5" },
-    { move: "up", title: "Выше", path: "M8 13V3M4.5 6.5 8 3l3.5 3.5" },
-    { move: "down", title: "Ниже", path: "M8 3v10M4.5 9.5 8 13l3.5-3.5" },
-    { move: "bottom", title: "В конец списка", path: "M3 13h10M8 3v7M4.5 6.5 8 10l3.5-3.5" },
-    { move: "outdent", title: "Уменьшить вложенность", path: "M13 8H3M6.5 4.5 3 8l3.5 3.5" },
-    { move: "indent", title: "Увеличить вложенность", path: "M3 8h10M9.5 4.5 13 8l-3.5 3.5" },
+    { move: "top", title: t("В начало списка"), path: "M3 3h10M8 13V6M4.5 9.5 8 6l3.5 3.5" },
+    { move: "up", title: t("Выше"), path: "M8 13V3M4.5 6.5 8 3l3.5 3.5" },
+    { move: "down", title: t("Ниже"), path: "M8 3v10M4.5 9.5 8 13l3.5-3.5" },
+    { move: "bottom", title: t("В конец списка"), path: "M3 13h10M8 3v7M4.5 6.5 8 10l3.5-3.5" },
+    { move: "outdent", title: t("Уменьшить вложенность"), path: "M13 8H3M6.5 4.5 3 8l3.5 3.5" },
+    { move: "indent", title: t("Увеличить вложенность"), path: "M3 8h10M9.5 4.5 13 8l-3.5 3.5" },
   ];
 
   const enabled = (m: ListMove | DepthMove) => m === "indent" || m === "outdent" ? can?.[m] : (m === "top" || m === "up" ? can?.up : can?.down);

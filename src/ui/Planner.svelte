@@ -3,7 +3,8 @@
   import { Gantt, Willow, Tooltip } from "@svar-ui/svelte-gantt";
   import type { IApi } from "@svar-ui/svelte-gantt";
   import { Locale } from "@svar-ui/svelte-core";
-  import { ru } from "@svar-ui/core-locales";
+  import { createI18n, I18N_KEY } from "./i18n";
+  import type { Language } from "../core/i18n";
 
   import { ProjectStore, StaleEditError, type Anchor, type StoreState } from "../core/store";
   import { DEFAULT_SETTINGS, type PlanRow, type TaskGroup, type TaskLine } from "../core/types";
@@ -22,7 +23,8 @@
   import { createToday } from "./today.svelte";
   import { navigateToToday } from "./todayNavigation";
 
-  let { store, initialLayout = { widths: {}, gridWidth: null }, onlayoutchange, onready, toolbarStart, toolbarEnd, empty }: {
+  let { language = "ru", store, initialLayout = { widths: {}, gridWidth: null }, onlayoutchange, onready, toolbarStart, toolbarEnd, empty }: {
+    language?: Language;
     store: ProjectStore;
     initialLayout?: GridLayout;
     onlayoutchange?: (layout: GridLayout) => void;
@@ -31,6 +33,8 @@
     toolbarEnd?: Snippet;
     empty?: Snippet;
   } = $props();
+  const { t, words } = untrack(() => createI18n(language));
+  setContext(I18N_KEY, untrack(() => createI18n(language)));
   const today = createToday();
   const instanceId = $props.id();
   let host: HTMLDivElement;
@@ -94,7 +98,7 @@
   setContext(MOVER_KEY, mover);
   // Fixed text width enables horizontal scrolling instead of shrinking the name
   // to zero when the planner is embedded in a narrow Obsidian pane.
-  const gridColumns = $derived(columns(true, { text: 260, ...layout.widths }));
+  const gridColumns = $derived(columns(true, { text: 260, ...layout.widths }).map(c => ({ ...c, header: typeof c.header === "string" ? t(c.header) : c.header })));
   let dialog = $state<
     | { mode: "edit"; row: PlanRow; content: string }
     | { mode: "add"; parent: PlanRow; content: string }
@@ -130,7 +134,7 @@
     if (changed) { collapsed = new Set(); highlighted = new Set(); stage = ""; dialog = null; settingsOpen = false; }
     if (stage && !projectStages(s.project.frontmatter.stages, collectStageTags(s.plan.rows)).includes(stage)) stage = "";
   })));
-  $effect(() => store.onError(error => notify(`Не удалось обновить проект: ${error}`)));
+  $effect(() => store.onError(error => notify(`${t("Не удалось обновить проект")}: ${error}`)));
 
   let noticeTimer: ReturnType<typeof setTimeout>;
   onDestroy(() => clearTimeout(noticeTimer));
@@ -145,7 +149,7 @@
     try {
       await store!.apply(anchors, edit, expected);
     } catch (e) {
-      notify(e instanceof StaleEditError ? e.message : `Ошибка записи: ${e}`);
+      notify(e instanceof StaleEditError ? t(e.message) : `${t("Ошибка записи")}: ${e}`);
     }
   }
 
@@ -189,7 +193,7 @@
       const anchor = drop.mode === "into-group" ? drop.group : drop.task;
       await write([task, anchor], lines => edits.moveTask(lines, task, drop));
     } else {
-      notify("Сюда задачу не перенести");
+      notify(t("Сюда задачу не перенести"));
     }
     // a refused or no-op drop leaves SVAR's order out of sync with the file
     resync++;
@@ -311,12 +315,12 @@
   }
 
   function scrollToToday() {
-    navigateToToday(api, range, todayIso(), notify);
+    navigateToToday(api, range, todayIso(), message => notify(t(message)));
   }
 
   async function saveSettings(result: SettingsResult) {
     settingsOpen = false;
-    if (settingsVersion !== current?.content) { notify(new StaleEditError().message); return; }
+    if (settingsVersion !== current?.content) { notify(t(new StaleEditError().message)); return; }
     const oldMarkers = current?.project.frontmatter.markers ?? [];
     const stagesChanged = JSON.stringify(result.stages) !== JSON.stringify(declaredStages);
     const markersChanged = JSON.stringify(result.markers) !== JSON.stringify(
@@ -430,7 +434,7 @@
     const d = dialog;
     dialog = null;
     if (!d) return;
-    if (d.content !== current?.content) { notify(new StaleEditError().message); return; }
+    if (d.content !== current?.content) { notify(t(new StaleEditError().message)); return; }
     const tags = [...result.special, ...result.stages].map(s => ` #${s}`).join("");
     if (d.mode === "add") {
       const parent = d.parent;
@@ -446,7 +450,7 @@
       } else if (parent.group) {
         await write([parent.group], lines => edits.addTask(lines, parent.group!.lineNumber, text, start, result.end).lines);
       } else {
-        notify("В файле нет заголовка # — некуда добавить задачу");
+        notify(t("В файле нет заголовка # — некуда добавить задачу"));
       }
       return;
     }
@@ -498,44 +502,44 @@
   use:projectStyles={`${colorCss(current?.project.frontmatter.colors)}\n${statusCss(current?.plan, current?.project.frontmatter.colors)}\n${overdueCss(current?.plan, today.iso)}`}>
   <header class="pp-toolbar">
     {@render toolbarStart?.()}
-    <span class="pp-title" title={current?.path}>{current?.plan.title ?? "Нет открытого проекта"}</span>
+    <span class="pp-title" title={current?.path}>{current?.plan.title ?? t("Нет открытого проекта")}</span>
 
     {#if stages.length}
       <select bind:value={stage}>
-        <option value="">Все этапы</option>
+        <option value="">{t("Все этапы")}</option>
         {#each stages as s (s)}<option value={s}>#{s}</option>{/each}
       </select>
     {/if}
 
     {#each [1, 2, 3, 4, 5] as lvl (lvl)}
-      <button class="pp-level" title="Свернуть/развернуть уровень {lvl}" onclick={() => toggleLevel(lvl)}>±{lvl}</button>
+      <button class="pp-level" title={`${t("Свернуть/развернуть уровень")} ${lvl}`} onclick={() => toggleLevel(lvl)}>±{lvl}</button>
     {/each}
 
-    <button title="Уже дни" onclick={() => zoom(-4)}>−</button>
-    <button title="Шире дни" onclick={() => zoom(+4)}>+</button>
-    <button onclick={scrollToToday}>Сегодня</button>
+    <button title={t("Уже дни")} onclick={() => zoom(-4)}>−</button>
+    <button title={t("Шире дни")} onclick={() => zoom(+4)}>+</button>
+    <button onclick={scrollToToday}>{t("Сегодня")}</button>
     <button
       class="pp-primary"
       disabled={!current}
       onclick={() => { const root = rowsById.get(ROOT_ID); if (root) dialog = { mode: "add", parent: root, content: current!.content }; }}
-    >+ Задача</button>
+    >{t("+ Задача")}</button>
 
     <span class="pp-spacer"></span>
     {@render toolbarEnd?.()}
-    <button disabled={!current} title="Настройки проекта" onclick={() => { settingsVersion = current?.content; settingsOpen = true; }}>⚙</button>
+    <button disabled={!current} title={t("Настройки проекта")} onclick={() => { settingsVersion = current?.content; settingsOpen = true; }}>⚙</button>
   </header>
 
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-  <main class="pp-gantt" use:markerLayer={{ api: () => api, markers: () => allMarkers(plan?.markers ?? [], today.iso), today: today.iso }} onclick={onScaleClick}>
+  <main class="pp-gantt" use:markerLayer={{ api: () => api, markers: () => allMarkers(plan?.markers ?? [], today.iso).map(m => m.today ? { ...m, label: t(m.label) } : m), today: today.iso }} onclick={onScaleClick}>
     {#if current}
-      <Locale words={ru}>
+      <Locale {words}>
         <Willow fonts={false}>
           <Tooltip api={api ?? undefined} content={TaskTooltip}>
             <Gantt
               {init}
               tasks={data.tasks}
               links={data.links}
-              {scales}
+              scales={scales.map(s => ({ ...s, format: t(s.format) }))}
               columns={gridColumns}
               {gridWidth}
               {taskTypes}
@@ -552,7 +556,7 @@
       </Locale>
     {:else}
       <div class="pp-empty">
-        {#if empty}{@render empty()}{:else}<p>Нет открытого проекта.</p>{/if}
+        {#if empty}{@render empty()}{:else}<p>{t("Нет открытого проекта.")}</p>{/if}
       </div>
     {/if}
   </main>

@@ -8,6 +8,8 @@
 </script>
 
 <script lang="ts">
+  import { getI18n } from "./i18n";
+  const { t, words } = getI18n();
   import { dialogKeys } from "./dialogKeys";
   // Project settings — stored in the file's frontmatter (`stages:`, `markers:`).
   import { untrack } from "svelte";
@@ -81,51 +83,51 @@
 
 <div class="pp-backdrop" role="presentation" onclick={oncancel}></div>
 <div class="pp-dialog pp-settings" use:dialogKeys={e => { if (e.key === "Escape") oncancel(); }}>
-  <h3>Настройки проекта</h3>
+  <h3>{t("Настройки проекта")}</h3>
 
   <!-- ── Этапы ── -->
-  <div class="pp-section-title">Этапы <span class="pp-dim">(предлагаются галочками в карточке задачи)</span></div>
+  <div class="pp-section-title">{t("Этапы")} <span class="pp-dim">{t("(предлагаются галочками в карточке задачи)")}</span></div>
   {#if list.length}
     <ul class="pp-stage-list">
       {#each list as s, i (s)}
         <li>
           <span>#{s}</span>
-          {#if !found.includes(s)}<span class="pp-dim">не используется</span>{/if}
+          {#if !found.includes(s)}<span class="pp-dim">{t("не используется")}</span>{/if}
           <span class="pp-spacer"></span>
-          <button type="button" title="Выше" disabled={i === 0} onclick={() => move(i, -1)}>↑</button>
-          <button type="button" title="Ниже" disabled={i === list.length - 1} onclick={() => move(i, 1)}>↓</button>
-          <button type="button" title="Убрать из списка (теги в задачах не трогаются)" onclick={() => (list = list.filter(x => x !== s))}>×</button>
+          <button type="button" title={t("Выше")} disabled={i === 0} onclick={() => move(i, -1)}>↑</button>
+          <button type="button" title={t("Ниже")} disabled={i === list.length - 1} onclick={() => move(i, 1)}>↓</button>
+          <button type="button" title={t("Убрать из списка (теги в задачах не трогаются)")} onclick={() => (list = list.filter(x => x !== s))}>×</button>
         </li>
       {/each}
     </ul>
   {:else}
-    <p class="pp-dim">Список пуст.</p>
+    <p class="pp-dim">{t("Список пуст.")}</p>
   {/if}
 
   <form class="pp-row" onsubmit={add}>
     <input placeholder="stage3" bind:value={draft} />
-    <button type="submit" disabled={!canAdd}>Добавить{normalized && canAdd ? ` #${normalized}` : ""}</button>
+    <button type="submit" disabled={!canAdd}>{t("Добавить")}{normalized && canAdd ? ` #${normalized}` : ""}</button>
   </form>
 
   {#if missing.length}
     <div class="pp-row">
-      <span class="pp-dim">В задачах есть ещё: {missing.map(s => "#" + s).join(" ")}</span>
-      <button type="button" onclick={() => (list = [...list, ...missing])}>Добавить найденные</button>
+      <span class="pp-dim">{t("В задачах есть ещё")}: {missing.map(s => "#" + s).join(" ")}</span>
+      <button type="button" onclick={() => (list = [...list, ...missing])}>{t("Добавить найденные")}</button>
     </div>
   {/if}
 
   <!-- ── Маркеры ── -->
-  <div class="pp-section-title">Маркеры <span class="pp-dim">(вертикальные линии на диаграмме; «Сегодня» рисуется всегда)</span></div>
+  <div class="pp-section-title">{t("Маркеры")} <span class="pp-dim">{t("(вертикальные линии на диаграмме; «Сегодня» рисуется всегда)")}</span></div>
   {#if marks.length}
     <div class="pp-marker-list">
       {#each marks as m, i (i)}
         <div class="pp-marker-row">
           <DateField bind:value={m.date} invalid={!ISO.test(m.date)} />
-          <input class="pp-marker-label" placeholder="Подпись" bind:value={m.label} />
+          <input class="pp-marker-label" placeholder={t("Подпись")} bind:value={m.label} />
           <span class="pp-swatch" style="background:{m.color}"></span>
-          <input class="pp-marker-color" bind:value={m.color} title="CSS-цвет: red, #2f80ed…" />
-          <input type="color" value={hex(m.color)} oninput={e => (m.color = (e.target as HTMLInputElement).value)} title="Выбрать цвет" />
-          <button type="button" title="Удалить маркер" onclick={() => (marks = marks.filter((_, j) => j !== i))}>×</button>
+          <input class="pp-marker-color" bind:value={m.color} title={t("CSS-цвет: red, #2f80ed…")} />
+          <input type="color" value={hex(m.color)} oninput={e => (m.color = (e.target as HTMLInputElement).value)} title={t("Выбрать цвет")} />
+          <button type="button" title={t("Удалить маркер")} onclick={() => (marks = marks.filter((_, j) => j !== i))}>×</button>
         </div>
         <div class="pp-palette">
           {#each PALETTE as c (c)}
@@ -135,12 +137,12 @@
       {/each}
     </div>
   {:else}
-    <p class="pp-dim">Маркеров нет.</p>
+    <p class="pp-dim">{t("Маркеров нет.")}</p>
   {/if}
-  <div><button type="button" onclick={addMarker}>+ Маркер</button></div>
+  <div><button type="button" onclick={addMarker}>{t("+ Маркер")}</button></div>
 
   <div class="pp-buttons">
-    <button type="button" onclick={oncancel}>Отмена</button>
-    <button type="button" class="pp-primary" disabled={!marksValid} onclick={save}>Сохранить</button>
+    <button type="button" onclick={oncancel}>{t("Отмена")}</button>
+    <button type="button" class="pp-primary" disabled={!marksValid} onclick={save}>{t("Сохранить")}</button>
   </div>
 </div>
