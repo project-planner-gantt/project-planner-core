@@ -4,7 +4,7 @@ import type { Plan, PlanRow, ProjectColors } from "../core/types";
 // PlanRow (ISO, включительный end) ⇄ SVAR ITask (Date, исключающий end).
 // Единственное место, знающее о формате SVAR.
 
-export const STATUS_TYPES = ["done", "cancelled", "critical", "blocked", "in-progress"] as const;
+export const STATUS_TYPES = ["done", "cancelled", "blocked", "in-progress"] as const;
 
 export function isoToDate(iso: string): Date {
   const [y, m, d] = iso.split("-").map(Number);
@@ -26,7 +26,6 @@ function barType(row: PlanRow): string {
   if (row.kind === "root" || row.kind === "group") return "summary";
   if (row.kind === "milestone") return "milestone";
   if (row.cancelled) return "cancelled";
-  if (row.critical) return "critical";
   if (row.done) return "done";
   if (row.task?.tags.includes("blocked")) return "blocked";
   if (row.task?.tags.includes("in-progress")) return "in-progress";
@@ -94,7 +93,6 @@ export function colorCss(colors: ProjectColors = {}): string {
     done: colors.done ?? "#6BBF59",
     cancelled: colors.cancelled ?? "#B8BEC7",
     blocked: colors.blocked ?? "#E84855",
-    critical: colors.critical ?? "#E84855",
     milestone: colors.milestone ?? "#9B5DE5",
     summary: colors.group ?? "#7B8CDE",
   };
@@ -126,7 +124,8 @@ export function statusCss(plan: Plan | null | undefined, colors: ProjectColors =
   const blocked = colors.blocked ?? "#E84855";
   return [
     rule(rows.filter(r => r.kind === "milestone" && r.task?.tags.includes("blocked") && !r.done && !r.cancelled).map(diamond), `background-color: ${blocked}; border-color: ${blocked};`),
-    rule(rows.filter(r => r.kind === "milestone" && r.critical && !r.done && !r.cancelled).map(diamond), `outline: 2px solid ${critical}; outline-offset: 1px;`),
+    rule(rows.filter(r => (r.kind === "task" || r.kind === "milestone") && r.critical && !r.done && !r.cancelled)
+      .map(r => r.kind === "milestone" ? diamond(r) : `.pp-gantt .wx-bar.wx-task[data-id=${id(r)}]`), `outline: 2px solid ${critical}; outline-offset: 1px;`),
     rule(rows.filter(r => r.kind === "milestone" && r.done).map(diamond), `background-color: ${done}; border-color: ${done};`),
     rule(rows.filter(r => r.kind === "milestone" && r.cancelled).map(diamond), `background-color: ${cancelled}; border-color: ${cancelled};`),
     rule(rows.filter(r => r.cancelled).map(r => `.pp-gantt .wx-row[data-id=${id(r)}] .wx-cell`), "color: #9ca3af; text-decoration: line-through;"),
@@ -142,7 +141,7 @@ export function isOverdue(row: PlanRow, today: string): boolean {
 /**
  * Red outline for overdue bars. SVAR has no per-task class, so the rule goes by
  * the bar's `data-id` (":" + id for string ids). The offset keeps it visible on
- * red (blocked / critical) bars too.
+ * red blocked bars too.
  */
 export function overdueCss(plan: Plan | null | undefined, today: string): string {
   const ids = (plan?.rows ?? []).filter(r => isOverdue(r, today)).map(r => JSON.stringify(`:${r.id}`));
