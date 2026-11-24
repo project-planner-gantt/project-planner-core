@@ -36,6 +36,35 @@ function setup(storage = new Storage()) {
 function task(store: ProjectStore) { return store.state!.plan.rows.find(r => r.id === "a")!.task!; }
 
 describe("store concurrency and lifecycle", () => {
+  it("normalizes task tags on open, preserving metadata, notes and CRLF", async () => {
+    const { storage, store } = setup();
+    const raw = "# Plan\r\n- [ ] разработка⏳ 2026-11-23 #stage-be #stage-dev #stage-fe 📅 2026-12-07 ⛔ ^dep ^a\r\n\tnote #keep\r\n";
+    const expected = raw.replace("разработка⏳ 2026-11-23 #stage-be #stage-dev #stage-fe", "разработка #stage-be #stage-dev #stage-fe ⏳ 2026-11-23");
+    storage.files.set("plan.md", raw);
+    let writes = 0;
+    const update = storage.updateText.bind(storage);
+    storage.updateText = async (path, transform) => { writes++; return update(path, transform); };
+    await store.open("plan.md");
+    expect(storage.files.get("plan.md")).toBe(expected);
+    expect(store.state!.content).toBe(expected);
+    expect(task(store)).toMatchObject({ description: "разработка", scheduledDate: "2026-11-23", dueDate: "2026-12-07", tags: ["stage-be", "stage-dev", "stage-fe"] });
+    await store.refresh();
+    await store.open("plan.md");
+    expect(writes).toBe(1);
+    store.close();
+  });
+
+  it("keeps concurrent changes when startup normalization loses a race", async () => {
+    const { storage, store } = setup();
+    const raw = "# Plan\n- [ ] Original⏳ 2026-11-23 #stage-be ^a\n";
+    storage.files.set("plan.md", raw);
+    storage.beforeUpdate = () => storage.files.set("plan.md", raw + "External note\n");
+    await store.open("plan.md");
+    expect(storage.files.get("plan.md")).toBe(raw + "External note\n");
+    expect(store.state!.content).toBe(raw + "External note\n");
+    store.close();
+  });
+
   it("checks the exact source inside the host's atomic update", async () => {
     const { storage, store } = setup(); await store.open("plan.md");
     const anchor = task(store);

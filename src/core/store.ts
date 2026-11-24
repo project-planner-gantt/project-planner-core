@@ -3,7 +3,7 @@ import { dirname, joinPath } from "./document";
 import type { ParsedProject, Plan, PlannerSettings, TaskLine, TaskGroup } from "./types";
 import { parseProject, allTasks, type EmbedResolver } from "./parser";
 import { mapProject } from "./mapper";
-import { ensureBlockIds, taskBody, groupIntro, type Lines } from "./edits";
+import { ensureBlockIds, normalizeTaskTags, taskBody, groupIntro, type Lines } from "./edits";
 
 export type Anchor = TaskLine | TaskGroup;
 export interface StoreState {
@@ -91,10 +91,11 @@ export class ProjectStore {
     let project = await parseProject(content, path, this.settings, resolver);
     if (generation !== this.generation) return;
     const tasks = allTasks(project).filter(t => t.filePath === path);
-    if (tasks.some(t => !t.hasBlockId)) {
-      const eol = content.includes("\r\n") ? "\r\n" : "\n";
+    const eol = content.includes("\r\n") ? "\r\n" : "\n";
+    const normalized = normalizeTaskTags(split(content), tasks);
+    if (tasks.some(t => !t.hasBlockId) || normalized.join(eol) !== content) {
       try {
-        content = await this.update(path, content, text => ensureBlockIds(split(text), tasks).join(eol));
+        content = await this.update(path, content, () => ensureBlockIds(normalized, tasks).join(eol));
       } catch (error) {
         if (error instanceof StaleEditError) content = await this.fs.readText(path);
         else throw error;
