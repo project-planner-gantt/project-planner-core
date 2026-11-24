@@ -231,6 +231,20 @@ function insertAfterDescription(line: string, token: string): string {
   return `${line.slice(0, m.index).trimEnd()} ${token} ${line.slice(m.index).trimStart()}`;
 }
 
+/** Canonical tag placement for tasks loaded from a project document. */
+export function normalizeTaskTags(lines: Lines, tasks: TaskLine[]): Lines {
+  const next = [...lines];
+  for (const task of tasks) {
+    const line = next[task.lineNumber];
+    if (line === undefined || !task.tags.length) continue;
+    // Hash fragments in URLs and wiki links are not standalone task tags.
+    const tags = [...line.matchAll(/(?<!\S)#[\w/-]+/g)].map(match => match[0]);
+    if (!tags.length) continue;
+    next[task.lineNumber] = insertAfterDescription(line.replace(/\s+#[\w/-]+/g, ""), tags.join(" "));
+  }
+  return next;
+}
+
 /** Put `#tag` on the task (after the description) or take it off. */
 export function setTag(lines: Lines, task: TaskLine, tag: string, on: boolean): Lines {
   const re = new RegExp(String.raw`\s*#${escapeRegex(tag)}(?![\w/-])`, "g");

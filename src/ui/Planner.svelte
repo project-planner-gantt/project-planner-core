@@ -473,7 +473,8 @@
       // only the lines under the task change, so the task's line number stays valid
       let next = bodyChanged ? edits.setTaskBody(lines, task, result.body!) : lines;
       if (result.text !== task.description) next = edits.renameTask(next, task, result.text);
-      if (stagesChanged) next = edits.setStageTags(next, task, result.stages);
+      // Also repair tags written after date fields by older application builds.
+      if (stagesChanged || result.stages.length) next = edits.setStageTags(next, task, result.stages);
       for (const tag of SPECIAL_TAGS) {
         const on = result.special.includes(tag);
         if (on !== task.tags.includes(tag)) next = edits.setTag(next, task, tag, on);

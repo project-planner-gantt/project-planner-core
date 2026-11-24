@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseTaskLine, parseProject, parseFrontmatter } from "../src/core/parser";
-import { setStageTags } from "../src/core/edits";
+import { setStageTags, normalizeTaskTags } from "../src/core/edits";
 import { setFrontmatterKey } from "../src/core/frontmatter";
 import { DEFAULT_SETTINGS } from "../src/core/types";
 
@@ -127,6 +127,31 @@ describe("deleteTask", () => {
 import { setTag } from "../src/core/edits";
 
 describe("insertion after the description", () => {
+  it("preserves link fragments during automatic tag normalization", () => {
+    const raw = "- [ ] [[Spec#section]] [docs](https://example.com/#guide) ⏳ 2026-11-23 #stage-be ^me";
+    expect(normalizeTaskTags([raw], [task(raw)])).toEqual([
+      "- [ ] [[Spec#section]] [docs](https://example.com/#guide) #stage-be ⏳ 2026-11-23 ^me",
+    ]);
+    const linkOnly = "- [ ] [[Spec#section]] 📅 2026-12-07 ^me";
+    expect(normalizeTaskTags([linkOnly], [task(linkOnly)])).toEqual([linkOnly]);
+  });
+  it.each([
+    "- [ ] разработка⏳ 2026-11-23 📅 2026-12-07 ^task-1792399441995-zy13z",
+    "- [ ] разработка⏳ 2026-11-23 #stage-be #stage-dev #stage-fe 📅 2026-12-07 ^task-1792399441995-zy13z",
+  ])("places stage tags before the attached scheduled date: %s", raw => {
+    const t = task(raw);
+    const stages = ["stage-be", "stage-dev", "stage-fe"];
+    const updated = setStageTags([raw], t, stages);
+    expect(updated).toEqual([
+      "- [ ] разработка #stage-be #stage-dev #stage-fe ⏳ 2026-11-23 📅 2026-12-07 ^task-1792399441995-zy13z",
+    ]);
+    expect(task(updated[0])).toMatchObject({
+      description: "разработка", tags: stages, scheduledDate: "2026-11-23",
+      dueDate: "2026-12-07", id: "task-1792399441995-zy13z",
+    });
+    expect(setStageTags(updated, t, stages)).toEqual(updated);
+  });
+
   it("finds the first field even without a space before it", () => {
     const t = task("- [ ] аналитика⏳ 2026-10-14 📅 2026-10-30 ^me");
     expect(setStageTags([t.raw], t, ["stage-sa"])).toEqual(["- [ ] аналитика #stage-sa ⏳ 2026-10-14 📅 2026-10-30 ^me"]);
